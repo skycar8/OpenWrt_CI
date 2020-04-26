@@ -24,6 +24,7 @@ on:
 # BUILD_PACKAGE         只编译某个package
 # DIY_SH                DIY 脚本文件名
 # SSH_ACTIONS           包含所有 ipk 文件和固件的目录，默认 false
+# UPDATE_CONFIG         是否更新config文件，如果通过ssh修改了config文件并希望永久生效请设置为true，默认 false
 # UPLOAD_BIN_DIR        上传 bin 目录（包含所有 ipk 文件和固件的目录），默认 false
 # UPLOAD_FIRMWARE       只上传固件目录（不包含ipk），默认 true
 # UPLOAD_COWTRANSFER    上传固件到奶牛快传，默认 true
@@ -32,11 +33,12 @@ on:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 env:
   REPO_URL: https://git.openwrt.org/openwrt/openwrt.git   
-  REPO_BRANCH: master
+  REPO_BRANCH: openwrt-19.07
   CONFIG_FILE: x86_64.config
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
   SSH_ACTIONS: false
+  UPDATE_CONFIG: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: true
@@ -69,12 +71,6 @@ jobs:
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
 
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
-
     - name: Load custom configuration
       run: |
         [ -e files ] && mv files openwrt/files
@@ -82,6 +78,12 @@ jobs:
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
+
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
 
     - name: SSH connection to Actions
       uses: csexton/debugger-action@master
@@ -93,7 +95,10 @@ jobs:
         cd openwrt
         make defconfig
         make download -j8
+        echo "=============================================="
+        echo "Packages failed to downloaded:"
         find dl -size -1024c -exec ls -l {} \;
+        echo "=============================================="
         find dl -size -1024c -exec rm -f {} \;
 
     - name: Compile the firmware
@@ -102,7 +107,15 @@ jobs:
         cd openwrt
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 V=s
-        echo "::set-output name=status::success"
+        echo "=============================================="
+        echo "Space usage:"
+        echo "=============================================="
+        df -h
+        echo "=============================================="
+        du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
+        du -h --max-depth=1 ./build_dir
+        du -h --max-depth=1 ./bin
+        if [ $(find dddd -name '*.gz' -size +5M | wc -l) -gt 1 ]; then echo "::set-output name=status::success"; fi;
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
@@ -113,7 +126,7 @@ jobs:
 
     - name: Organize files
       id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
@@ -126,6 +139,13 @@ jobs:
       with:
         name: OpenWrt_firmware
         path: ${{ env.FIRMWARE }}
+
+    # - name: Upload config file
+    #  uses: actions/upload-artifact@master
+    #  if: steps.organize.outputs.status == 'success' && !cancelled() && env.UPDATE_CONFIG == 'true'
+    #  with:
+    #    name: new.config
+    #    path: openwrt/.config
 
     - name: Upload firmware to cowtransfer
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
