@@ -86,7 +86,7 @@ jobs:
       run: cd openwrt # && ./scripts/feeds install -a
 
     - name: Waiting for SSH connection...
-      uses: csexton/debugger-action@master
+      uses: mxschmitt/action-tmate@v2 # csexton/debugger-action@master
       if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Download package
@@ -137,7 +137,7 @@ jobs:
     - name: Update config file
       if: steps.organize.outputs.status == 'success' && !cancelled() && env.UPDATE_CONFIG == 'true'
       run: |
-        mv $CONFIG_FILE ${CONFIG_FILE}.bak
+        mv $CONFIG_FILE "${CONFIG_FILE}".bak
         cp openwrt/.config $CONFIG_FILE
         git config user.name ${{ github.event.repository.owner.name }}
         git config user.email "tmp@tmp.com"
