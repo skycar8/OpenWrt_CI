@@ -85,8 +85,8 @@ jobs:
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
 
-    - name: SSH connection to Actions
-      uses: csexton/debugger-action@master
+    - name: Waiting for SSH connection...
+      uses: mxschmitt/action-tmate@v2
       if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Download package
