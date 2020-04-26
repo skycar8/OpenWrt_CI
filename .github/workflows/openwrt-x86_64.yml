@@ -38,7 +38,7 @@ env:
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
   SSH_ACTIONS: true
-  UPDATE_CONFIG: false
+  UPDATE_CONFIG: true
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: true
@@ -94,7 +94,7 @@ jobs:
       run: |
         cd openwrt
         make defconfig
-        make download -j8
+        # make download -j8
         echo "=============================================="
         echo "Packages failed to downloaded:"
         find dl -size -1024c -exec ls -l {} \;
@@ -129,17 +129,10 @@ jobs:
       id: organize
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        cd openwrt/bin/targets/*/*
-        rm -rf packages
+        # cd openwrt/bin/targets/*/*
+        # rm -rf packages
         echo "::set-env name=FIRMWARE::$PWD"
         echo "::set-output name=status::success"
-
-    - name: Upload firmware directory
-      uses: actions/upload-artifact@master
-      if: steps.organize.outputs.status == 'success' && !cancelled()
-      with:
-        name: OpenWrt_firmware
-        path: ${{ env.FIRMWARE }}
 
     - name: Update config file
       if: steps.organize.outputs.status == 'success' && !cancelled() && env.UPDATE_CONFIG == 'true'
@@ -151,6 +144,13 @@ jobs:
         git add $CONFIG_FILE
         git commit -m "Update $CONFIG_FILE By GitHub Actions"
         git push 
+        
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@master
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: OpenWrt_firmware
+        path: ${{ env.FIRMWARE }}
 
     - name: Upload firmware to cowtransfer
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
