@@ -112,9 +112,9 @@ jobs:
         echo "=============================================="
         df -h
         echo "=============================================="
-        du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
-        du -h --max-depth=1 ./build_dir
-        du -h --max-depth=1 ./bin
+        # du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
+        # du -h --max-depth=1 ./build_dir
+        # du -h --max-depth=1 ./bin
         # if [ $(find openwrt/bin/targets/*/* -name '*.gz' -size +5M | wc -l) -gt 1 ]; then echo "::set-output name=status::success"; fi;
         echo "::set-output name=status::success"
 
