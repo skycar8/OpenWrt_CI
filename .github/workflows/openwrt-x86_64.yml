@@ -37,7 +37,7 @@ env:
   CONFIG_FILE: x86_64.config
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   UPDATE_CONFIG: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -53,14 +53,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
+      with:
+        path: 'repository'
 
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         # swapoff命令用于关闭系统交换区
-        sudo swapoff /swapfile
-        sudo rm -rf /swapfile /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        # sudo swapoff /swapfile
+        # sudo rm -rf /swapfile /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         # 加上-E选项后，用户可以在sudo执行时保留当前用户已存在的环境变量，不会被sudo重置
         sudo -E apt-get -y update
         sudo -E apt-get -y install subversion build-essential libncurses5-dev zlib1g-dev gawk git ccache gettext libssl-dev xsltproc zip
@@ -73,8 +75,8 @@ jobs:
 
     - name: Load custom configuration
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        [ -e repository/files ] && mv repository/files openwrt/files
+        [ -e repository/$CONFIG_FILE ] && mv repository/$CONFIG_FILE openwrt/.config
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
@@ -106,7 +108,7 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 V=s
+        # make -j$(nproc) || make -j1 V=s
         echo "=============================================="
         echo "Space usage:"
         echo "=============================================="
@@ -115,7 +117,8 @@ jobs:
         du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
         du -h --max-depth=1 ./build_dir
         du -h --max-depth=1 ./bin
-        if [ $(find dddd -name '*.gz' -size +5M | wc -l) -gt 1 ]; then echo "::set-output name=status::success"; fi;
+        # if [ $(find openwrt/bin/targets/*/* -name '*.gz' -size +5M | wc -l) -gt 1 ]; then echo "::set-output name=status::success"; fi;
+        echo "::set-output name=status::success"
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
@@ -140,12 +143,17 @@ jobs:
         name: OpenWrt_firmware
         path: ${{ env.FIRMWARE }}
 
-    # - name: Upload config file
-    #  uses: actions/upload-artifact@master
-    #  if: steps.organize.outputs.status == 'success' && !cancelled() && env.UPDATE_CONFIG == 'true'
-    #  with:
-    #    name: new.config
-    #    path: openwrt/.config
+    - name: Update config file
+      if: steps.organize.outputs.status == 'success' && !cancelled() && env.UPDATE_CONFIG == 'true'
+      run: |
+        cd repository
+        mv $CONFIG_FILE
+        cp ../openwrt/.config $CONFIG_FILE
+        git config "GitHub Actions"
+        git config "github@actions.com"
+        git add $CONFIG_FILE
+        git commit -m "Update $CONFIG_FILE By GitHub Actions"
+        git push 
 
     - name: Upload firmware to cowtransfer
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
