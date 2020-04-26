@@ -95,11 +95,11 @@ jobs:
         cd openwrt
         # make defconfig
         # make download -j8
-        echo "=============================================="
-        echo "Packages failed to downloaded:"
-        find dl -size -1024c -exec ls -l {} \;
-        echo "=============================================="
-        find dl -size -1024c -exec rm -f {} \;
+        # echo "=============================================="
+        # echo "Packages failed to downloaded:"
+        # find dl -size -1024c -exec ls -l {} \;
+        # echo "=============================================="
+        # find dl -size -1024c -exec rm -f {} \;
 
     - name: Compile the firmware
       id: compile
