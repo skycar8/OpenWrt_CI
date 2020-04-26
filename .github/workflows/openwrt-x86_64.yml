@@ -11,20 +11,37 @@ on:
       - '.config'
 #  schedule:
 #    - cron: 0 8 * * 5
-  watch:
-    types: started
+watch:
+  types: started
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# 环境变量说明
+#
+# REPO_URL              源码仓库地址
+# REPO_BRANCH           源码分支
+# CONFIG_FILE           默认.config文件，你可以上传多个，比如x86_64.config、Arm64.config
+# BUILD_PACKAGES        只编译某些package
+# DIY_SH                DIY 脚本文件名
+# SSH_ACTIONS           包含所有 ipk 文件和固件的目录，默认 false
+# UPLOAD_BIN_DIR        上传 bin 目录（包含所有 ipk 文件和固件的目录），默认 false
+# UPLOAD_FIRMWARE       只上传固件目录（不包含ipk），默认 true
+# UPLOAD_COWTRANSFER    上传固件到奶牛快传，默认 true
+# UPLOAD_WETRANSFER     上传固件到 WeTransfer，默认 false
+# TIMEZONE              时区设置，默认 Asia/Shanghai
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 env:
-  REPO_URL: https://git.openwrt.org/openwrt/openwrt.git
-  REPO_BRANCH: openwrt-19.07
-  CONFIG_FILE: .config
+  REPO_URL: https://git.openwrt.org/openwrt/openwrt.git   
+  REPO_BRANCH: openwrt-19.07.2
+  CONFIG_FILE: x86_64.config
+  BUILD_PACKAGES: []
   DIY_SH: diy.sh
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
-  UPLOAD_COWTRANSFER: false
-  UPLOAD_WETRANSFER: true
-  TZ: Asia/Shanghai
+  UPLOAD_COWTRANSFER: true
+  UPLOAD_WETRANSFER: false
+  TIMEZONE: Asia/Shanghai
 
 jobs:
   build:
@@ -47,8 +64,7 @@ jobs:
         sudo -E apt-get -y install subversion build-essential libncurses5-dev zlib1g-dev gawk git ccache gettext libssl-dev xsltproc zip
         sudo -E apt-get -y autoremove --purge
         sudo -E apt-get -y clean
-        sudo timedatectl set-timezone "$TZ"
-        # curl -fsSL https://raw.githubusercontent.com/P3TERX/dotfiles/master/.bashrc >> ~/.bashrc
+        sudo timedatectl set-timezone "$TIMEZONE"
 
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
