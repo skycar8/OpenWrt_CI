@@ -21,7 +21,7 @@ on:
 # REPO_URL              源码仓库地址
 # REPO_BRANCH           源码分支
 # CONFIG_FILE           默认.config文件，你可以上传多个，比如x86_64.config、Arm64.config
-# BUILD_PACKAGES        只编译某些package
+# BUILD_PACKAGE         只编译某个package
 # DIY_SH                DIY 脚本文件名
 # SSH_ACTIONS           包含所有 ipk 文件和固件的目录，默认 false
 # UPLOAD_BIN_DIR        上传 bin 目录（包含所有 ipk 文件和固件的目录），默认 false
@@ -34,7 +34,7 @@ env:
   REPO_URL: https://git.openwrt.org/openwrt/openwrt.git   
   REPO_BRANCH: openwrt-19.07.2
   CONFIG_FILE: x86_64.config
-  BUILD_PACKAGES: []
+  # BUILD_PACKAGE: 
   DIY_SH: diy.sh
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
