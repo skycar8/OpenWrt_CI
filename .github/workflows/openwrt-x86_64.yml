@@ -53,8 +53,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
-      with:
-        path: 'repository'
 
     - name: Initialization environment
       env:
@@ -75,8 +73,8 @@ jobs:
 
     - name: Load custom configuration
       run: |
-        [ -e repository/files ] && mv repository/files openwrt/files
-        [ -e repository/$CONFIG_FILE ] && mv repository/$CONFIG_FILE openwrt/.config
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
@@ -146,9 +144,8 @@ jobs:
     - name: Update config file
       if: steps.organize.outputs.status == 'success' && !cancelled() && env.UPDATE_CONFIG == 'true'
       run: |
-        cd repository
         mv $CONFIG_FILE
-        cp ../openwrt/.config $CONFIG_FILE
+        cp openwrt/.config $CONFIG_FILE
         git config "GitHub Actions"
         git config "github@actions.com"
         git add $CONFIG_FILE
