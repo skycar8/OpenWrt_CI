@@ -37,7 +37,7 @@ env:
   CONFIG_FILE: x86_64.config
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPDATE_CONFIG: true
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -137,9 +137,10 @@ jobs:
     - name: Update config file
       if: steps.organize.outputs.status == 'success' && !cancelled() && env.UPDATE_CONFIG == 'true'
       run: |
-        mv $CONFIG_FILE "${CONFIG_FILE}".bak
+        mv $CONFIG_FILE ${CONFIG_FILE}.bak
         cp openwrt/.config $CONFIG_FILE
-        git config user.name ${{ github.event.repository.owner.name }}
+        echo "dsfddfsf" >> $CONFIG_FILE
+        git config user.name "GitHub Actions"
         git config user.email "tmp@tmp.com"
         git add $CONFIG_FILE
         git add ${CONFIG_FILE}.bak
