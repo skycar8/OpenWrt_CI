@@ -69,7 +69,7 @@ jobs:
         sudo timedatectl set-timezone "$TIMEZONE"
 
     - name: Clone source code
-      run: git clone --depth 1 $REPO_URL openwrt
+      run: git clone $REPO_URL openwrt
 
     - name: Pre config
       run: |
