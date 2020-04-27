@@ -69,7 +69,7 @@ jobs:
         sudo timedatectl set-timezone "$TIMEZONE"
 
     - name: Clone source code
-      run: git clone --depth 1 $REPO_URL openwrt
+      run: git clone $REPO_URL openwrt
 
     - name: Pre config
       run: |
@@ -82,7 +82,8 @@ jobs:
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
-
+    
+    # 必须在feeds install之后导入.config，否则会被覆盖
     - name: Load custom configuration
       run: |
         [ -e files ] && mv files openwrt/files
