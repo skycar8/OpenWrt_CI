@@ -33,7 +33,7 @@ on:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 env:
   REPO_URL: https://git.openwrt.org/openwrt/openwrt.git   
-  REPO_BRANCH: master
+  REPO_BRANCH: openwrt-19.07.2
   CONFIG_FILE: x86_64.config
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
@@ -93,7 +93,7 @@ jobs:
       id: package
       run: |
         cd openwrt
-        # make defconfig
+        make defconfig
         make download -j8
         echo "=============================================="
         echo "Packages failed to downloaded:"
