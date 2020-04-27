@@ -1,4 +1,4 @@
-name: Build OpenWrt
+name: Build OpenWrt test
 
 on:
   repository_dispatch:
@@ -9,6 +9,9 @@ on:
       - master
     paths:
       - '.config'
+  pull_request:
+    branches: master
+    
 #  schedule:
 #    - cron: 0 8 * * 5
   watch:
