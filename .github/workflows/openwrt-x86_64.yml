@@ -121,14 +121,14 @@ jobs:
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
-      if: success() && $UPLOAD_BIN_DIR == 'true'
+      if: success() && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin
         path: openwrt/bin
 
     - name: Organize files
       id: organize
-      if: $UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         if [ $(find ./bin/targets/*/* -name '*.gz' -size +5M | wc -l) -gt 1 ]
         then
