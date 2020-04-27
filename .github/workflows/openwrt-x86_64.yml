@@ -19,7 +19,7 @@ on:
 # 环境变量说明
 #
 # REPO_URL              源码仓库地址
-# REPO_BRANCH           源码分支
+# REPO_TAG              源码Tag
 # CONFIG_FILE           默认.config文件，你可以上传多个，比如x86_64.config、Arm64.config
 # BUILD_PACKAGE         只编译某个package
 # DIY_SH                DIY 脚本文件名
@@ -33,7 +33,7 @@ on:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 env:
   REPO_URL: https://git.openwrt.org/openwrt/openwrt.git   
-  REPO_BRANCH: master
+  REPO_TAG: v19.07.2
   CONFIG_FILE: x86_64.config
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
@@ -69,7 +69,19 @@ jobs:
         sudo timedatectl set-timezone "$TIMEZONE"
 
     - name: Clone source code
-      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+      run: git clone --depth 1 $REPO_URL openwrt
+
+    - name: Pre config
+      run: |
+        cd openwrt
+        if [ $REPO_TAG ]; then git checkout $REPO_TAG; fi;
+        echo "src-git Mine https://github.com/skycar8/OpenWrt-Packages.git" >> ./feeds.conf.default
+
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
@@ -78,12 +90,6 @@ jobs:
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
-
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
 
     - name: Waiting for SSH connection...
       uses: skycar8/action-tmate@v2
