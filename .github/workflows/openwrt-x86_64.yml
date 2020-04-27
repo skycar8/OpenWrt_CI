@@ -33,12 +33,12 @@ on:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 env:
   REPO_URL: https://git.openwrt.org/openwrt/openwrt.git   
-  REPO_TAG: v19.07.2
+  # REPO_TAG: v19.07.2
   CONFIG_FILE: x86_64.config
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
-  SSH_ACTIONS: true
-  UPDATE_CONFIG: true
+  SSH_ACTIONS: false
+  UPDATE_CONFIG: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: true
