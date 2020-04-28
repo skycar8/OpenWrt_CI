@@ -37,8 +37,8 @@ env:
   CONFIG_FILE: x86_64.config
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
-  SSH_ACTIONS: true
-  UPDATE_CONFIG: true
+  SSH_ACTIONS: false
+  UPDATE_CONFIG: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: false
   UPLOAD_COWTRANSFER: true
