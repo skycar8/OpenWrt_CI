@@ -134,8 +134,8 @@ jobs:
       id: organize
       if: success()
       run: |
-        if [ ! -e ./bin/targets/*/* ]; then exit 1; fi;
-        if [ $(find ./bin/targets/*/* -name '*.gz' -size +5M | wc -l) -lt 1 ]; then exit 1; fi;
+        if [ ! -e openwrt/bin/targets/*/* ]; then exit 1; fi;
+        if [ $(find openwrt/bin/targets/*/* -name '*.gz' -size +5M | wc -l) -lt 1 ]; then exit 1; fi;
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "::set-env name=FIRMWARE::$PWD"
