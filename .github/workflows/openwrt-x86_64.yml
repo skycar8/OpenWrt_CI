@@ -40,7 +40,7 @@ env:
   SSH_ACTIONS: false
   UPDATE_CONFIG: false
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: false
+  UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: true
   UPLOAD_WETRANSFER: false
   TIMEZONE: Asia/Shanghai
@@ -135,10 +135,10 @@ jobs:
       if: success()
       run: |
         if [ ! -e openwrt/bin/targets/*/* ]; then exit 1; fi;
-        if [ $(find openwrt/bin/targets/*/* -name '*.gz' -size +5M | wc -l) -lt 1 ]; then exit 1; fi;
+        if [ $(find openwrt/bin/targets/*/* -name '*.gz' -size +10M | wc -l) -lt 1 ]; then exit 1; fi;
         cd openwrt/bin/targets/*/*
         rm -rf packages
-        echo "::set-env name=FIRMWARE::$PWD"
+        echo "::set-env name=FIRMWARE::${PWD}/openwrt-x86-64-generic-ext4-combined.vmdk.gz"
         echo "::set-output name=status::success"
     
     - name: Upload firmware directory
