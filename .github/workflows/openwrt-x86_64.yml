@@ -59,7 +59,7 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         # swapoff命令用于关闭系统交换区
-        sudo swapoff /swapfile
+        # sudo swapoff /swapfile
         sudo rm -rf /swapfile /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         # 加上-E选项后，用户可以在sudo执行时保留当前用户已存在的环境变量，不会被sudo重置
         sudo -E apt-get -y update
