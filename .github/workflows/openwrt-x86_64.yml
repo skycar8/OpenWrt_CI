@@ -38,7 +38,7 @@ env:
   # BUILD_PACKAGE: 
   DIY_SH: diy.sh
   SSH_ACTIONS: false
-  UPDATE_CONFIG: false
+  UPDATE_CONFIG: true
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: true
